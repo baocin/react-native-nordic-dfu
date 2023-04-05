@@ -220,24 +220,29 @@ RCT_EXPORT_METHOD(startDFU:(NSString *)deviceAddress
 
         NSURL * url = [NSURL URLWithString:filePath];
 
-        DFUFirmware * firmware = [[DFUFirmware alloc] initWithUrlToZipFile:url];
+        @try {
+          DFUFirmware * firmware = [[DFUFirmware alloc] initWithUrlToZipFile:url];
 
-        DFUServiceInitiator * initiator = [[[DFUServiceInitiator alloc]
-                                            initWithCentralManager:centralManager
-                                            target:peripheral]
-                                           withFirmware:firmware];
+          DFUServiceInitiator * initiator = [[[DFUServiceInitiator alloc]
+                                              initWithCentralManager:centralManager
+                                              target:peripheral]
+                                            withFirmware:firmware];
 
-        initiator.logger = self;
-        initiator.delegate = self;
-        initiator.progressDelegate = self;
-        initiator.alternativeAdvertisingNameEnabled = alternativeAdvertisingNameEnabled;
+          initiator.logger = self;
+          initiator.delegate = self;
+          initiator.progressDelegate = self;
+          initiator.alternativeAdvertisingNameEnabled = alternativeAdvertisingNameEnabled;
 
-        // Change for iOS 13
-        initiator.packetReceiptNotificationParameter = 1; //Rate limit the DFU using PRN.
-        [NSThread sleepForTimeInterval: 2]; //Work around for being stuck in iOS 13
-        // End change for iOS 13
+          // Change for iOS 13
+          initiator.packetReceiptNotificationParameter = 1; //Rate limit the DFU using PRN.
+          [NSThread sleepForTimeInterval: 2]; //Work around for being stuck in iOS 13
+          // End change for iOS 13
 
-        DFUServiceController * controller = [initiator start];
+          DFUServiceController * controller = [initiator start];
+        } @catch (NSException * e) {
+          NSString *errorMessage = [NSString stringWithFormat:@"Unable to start DFU: %@, reason: %@", e.name, e.reason];
+          reject(@"unable_to_start_dfu", errorMessage, nil);
+        }
       }
     }
   }
