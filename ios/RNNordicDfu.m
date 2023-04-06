@@ -220,7 +220,7 @@ RCT_EXPORT_METHOD(startDFU:(NSString *)deviceAddress
 
         NSURL * url = [NSURL URLWithString:filePath];
 
-        DFUFirmware * firmware = [[DFUFirmware alloc] initWithUrlToZipFile:url];
+        DFUFirmware * firmware = [[DFUFirmware alloc] initWithUrlToZipFile:url error:nil];
           
         dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
           
@@ -237,10 +237,13 @@ RCT_EXPORT_METHOD(startDFU:(NSString *)deviceAddress
 
         // Change for iOS 13
         initiator.packetReceiptNotificationParameter = 1; //Rate limit the DFU using PRN.
+          
+          [initiator withFirmware:firmware];
+          
         [NSThread sleepForTimeInterval: 2]; //Work around for being stuck in iOS 13
         // End change for iOS 13
 
-        DFUServiceController * controller = [initiator startWithTarget:peripheral];
+          DFUServiceController * controller = [initiator startWithTarget:peripheral];
       }
     }
   }
