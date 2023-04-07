@@ -9,8 +9,8 @@
 @property (strong, nonatomic) RCTPromiseResolveBlock resolve;
 @property (strong, nonatomic) RCTPromiseRejectBlock reject;
 
-+ (void)setCentralManagerGetter:(CBCentralManager * (^)())getter;
-+ (void)setOnDFUComplete:(void (^)())onComplete;
-+ (void)setOnDFUError:(void (^)())onError;
++ (void)setCentralManagerGetter:(CBCentralManager * (^)(void))getter;
++ (void)setOnDFUComplete:(void (^)(void))onComplete;
++ (void)setOnDFUError:(void (^)(void))onError;
 
 @end
