@@ -221,27 +221,32 @@ RCT_EXPORT_METHOD(startDFU:(NSString *)deviceAddress
         NSURL * url = [NSURL URLWithString:filePath];
 
         @try {
-          DFUFirmware * firmware = [[DFUFirmware alloc] initWithUrlToZipFile:url];
+            NSError *error;
+            DFUFirmware *firmware = [[DFUFirmware alloc] initWithUrlToZipFile:url error:&error];
 
-          DFUServiceInitiator * initiator = [[[DFUServiceInitiator alloc]
-                                              initWithCentralManager:centralManager
-                                              target:peripheral]
-                                            withFirmware:firmware];
+            DFUServiceInitiator *initiator = [[DFUServiceInitiator alloc]
+                                                initWithQueue:nil
+                                                delegateQueue:dispatch_get_main_queue()
+                                                progressQueue:dispatch_get_main_queue()
+                                                loggerQueue:dispatch_get_main_queue()
+                                                centralManagerOptions:nil];
 
-          initiator.logger = self;
-          initiator.delegate = self;
-          initiator.progressDelegate = self;
-          initiator.alternativeAdvertisingNameEnabled = alternativeAdvertisingNameEnabled;
+            (void)[initiator withFirmware:firmware];
 
-          // Change for iOS 13
-          initiator.packetReceiptNotificationParameter = 1; //Rate limit the DFU using PRN.
-          [NSThread sleepForTimeInterval: 2]; //Work around for being stuck in iOS 13
-          // End change for iOS 13
+            initiator.logger = self;
+            initiator.delegate = self;
+            initiator.progressDelegate = self;
+            initiator.alternativeAdvertisingNameEnabled = alternativeAdvertisingNameEnabled;
 
-          DFUServiceController * controller = [initiator start];
+            // Change for iOS 13
+            initiator.packetReceiptNotificationParameter = 1; //Rate limit the DFU using PRN.
+            [NSThread sleepForTimeInterval: 2]; //Work around for being stuck in iOS 13
+            // End change for iOS 13
+
+            (void)[initiator startWithTargetWithIdentifier:peripheral.identifier];
         } @catch (NSException * e) {
-          NSString *errorMessage = [NSString stringWithFormat:@"Unable to start DFU: %@, reason: %@", e.name, e.reason];
-          reject(@"unable_to_start_dfu", errorMessage, nil);
+            NSString *errorMessage = [NSString stringWithFormat:@"Unable to start DFU: %@, reason: %@", e.name, e.reason];
+            reject(@"unable_to_start_dfu", errorMessage, nil);
         }
       }
     }
