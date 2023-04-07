@@ -1,4 +1,4 @@
-# react-native-nordic-dfu 
+# rn-nordic-dfu 
 
 This library allows you to do a Device Firmware Update (DFU) of your nrf51 or
 nrf52 chip from Nordic Semiconductor. It works for both iOS and Android.
@@ -10,7 +10,7 @@ For more info about the DFU process, see: [Resources](#resources)
 Install and link the NPM package per usual with
 
 ```bash
-npm install --save https://github.com/Nickolans/react-native-nordic-dfu
+npm install --save https://github.com/Nickolans/rn-nordic-dfu
 ```
 
 or
@@ -41,7 +41,7 @@ Add the following to your `Podfile`
 target "YourApp" do
 
   ...
-  pod "react-native-nordic-dfu", path: "../node_modules/react-native-nordic-dfu"
+  pod "rn-nordic-dfu", path: "../node_modules/rn-nordic-dfu"
   ...
 
 end
