@@ -5,7 +5,15 @@ nrf52 chip from Nordic Semiconductor. It works for both iOS and Android.
 
 For more info about the DFU process, see: [Resources](#resources)
 
-## Installation
+- [Installation](#installation)
+  - [iOS Installation](#ios-installation)
+  - [Update Podfile (Optional)](#update-podfile-optional)
+- [Bluetooth Integration](#bluetooth-integration)
+- [API](#api)
+- [Selecting File From Local Storage](#selecting-firmware-file-from-local-storage)
+- [Example Project](#example-project)
+
+# Installation
 
 Install and link the NPM package per usual with
 
@@ -19,19 +27,15 @@ or
 yarn add rn-nordic-dfu
 ```
 
-## iOS
-
-The iOS version of this library has native dependencies that need to be installed via `CocoaPods`, which is currently the only supported method for installing this library. (PR's for alternative installation methods are welcome!)
-
-Previous versions supported manual linking, but this was prone to errors every time a new version of XCode and/or Swift was released, which is why this support was dropped. If you've previously installed this library manually, you'll want to remove the old installation and replace it with CocoaPods.
-
-### CocoaPods
+## iOS Installation
 
 On your project directory;
 
 ```bash
 cd ios && pod install
 ```
+
+## Update Podfile (Optional)
 
 If your React Native version below 0.60 or any problem occures on pod command, you can try these steps;
 
@@ -57,7 +61,9 @@ Since there's native Swift dependencies you need to set which Swift version your
 
 If your React Native version is higher than 0.60, probably it's already there.
 
-### Bluetooth integration
+# Bluetooth integration
+
+## iOS
 
 This library needs access to an instance of `CBCentralManager`, which you most likely will have instantiated already if you're using Bluetooth for other purposes than DFU in your project.
 
@@ -149,7 +155,7 @@ import { NordicDFU, DFUEmitter } from "react-native-nordic-dfu";
 
 NordicDFU.startDFU({
   deviceAddress: "C3:53:C0:39:2F:99",
-  deviceName: "Pilloxa Pillbox",
+  deviceName: "Device Name",
   filePath: "/data/user/0/com.nordicdfuexample/files/RNFetchBlobTmp4of.zip",
 })
   .then((res) => console.log("Transfer done:", res))
