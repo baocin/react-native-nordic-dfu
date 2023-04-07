@@ -238,10 +238,10 @@ RCT_EXPORT_METHOD(startDFU:(NSString *)deviceAddress
             initiator.progressDelegate = self;
             initiator.alternativeAdvertisingNameEnabled = alternativeAdvertisingNameEnabled;
 
-            // Change for iOS 13
+            // Change for iOS 13+
             initiator.packetReceiptNotificationParameter = 1; //Rate limit the DFU using PRN.
-            [NSThread sleepForTimeInterval: 2]; //Work around for being stuck in iOS 13
-            // End change for iOS 13
+            [NSThread sleepForTimeInterval: 5]; //Work around for being stuck in iOS 13+
+            // End change for iOS 13+
 
             (void)[initiator startWithTargetWithIdentifier:peripheral.identifier];
         } @catch (NSException * e) {
