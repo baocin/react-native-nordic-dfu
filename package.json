@@ -1,6 +1,6 @@
 {
   "name": "rn-nordic-dfu",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Nordic Device Firmware Update for React Native",
   "main": "index.js",
   "url": "https://github.com/Nickolans/react-native-nordic-dfu",
