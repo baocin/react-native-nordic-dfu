@@ -208,7 +208,7 @@ RCT_EXPORT_METHOD(startDFU:(NSString *)deviceAddress
       NSUUID * uuid = [[NSUUID alloc] initWithUUIDString:deviceAddress];
 
       // Change for iOS 13
-      [NSThread sleepForTimeInterval: 1]; //Work around for not finding the peripheral in iOS 13
+      [NSThread sleepForTimeInterval: 3]; //Work around for not finding the peripheral in iOS 13
       // End change for iOS 13
       
       NSArray<CBPeripheral *> * peripherals = [centralManager retrievePeripheralsWithIdentifiers:@[uuid]];
