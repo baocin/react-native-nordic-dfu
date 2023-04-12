@@ -2,9 +2,9 @@
 #import <CoreBluetooth/CoreBluetooth.h>
 @import iOSDFULibrary;
 
-static CBCentralManager * (^getCentralManager)();
-static void (^onDFUComplete)();
-static void (^onDFUError)();
+static CBCentralManager * (^getCentralManager)(void);
+static void (^onDFUComplete)(void);
+static void (^onDFUError)(void);
 
 @implementation RNNordicDfu
 
@@ -208,7 +208,7 @@ RCT_EXPORT_METHOD(startDFU:(NSString *)deviceAddress
       NSUUID * uuid = [[NSUUID alloc] initWithUUIDString:deviceAddress];
 
       // Change for iOS 13
-      [NSThread sleepForTimeInterval: 1]; //Work around for not finding the peripheral in iOS 13
+      [NSThread sleepForTimeInterval: 3]; //Work around for not finding the peripheral in iOS 13
       // End change for iOS 13
       
       NSArray<CBPeripheral *> * peripherals = [centralManager retrievePeripheralsWithIdentifiers:@[uuid]];
@@ -220,40 +220,51 @@ RCT_EXPORT_METHOD(startDFU:(NSString *)deviceAddress
 
         NSURL * url = [NSURL URLWithString:filePath];
 
-        DFUFirmware * firmware = [[DFUFirmware alloc] initWithUrlToZipFile:url];
+        @try {
+            NSError *error;
+            DFUFirmware *firmware = [[DFUFirmware alloc] initWithUrlToZipFile:url error:&error];
 
-        DFUServiceInitiator * initiator = [[[DFUServiceInitiator alloc]
-                                            initWithCentralManager:centralManager
-                                            target:peripheral]
-                                           withFirmware:firmware];
+            dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
 
-        initiator.logger = self;
-        initiator.delegate = self;
-        initiator.progressDelegate = self;
-        initiator.alternativeAdvertisingNameEnabled = alternativeAdvertisingNameEnabled;
+            DFUServiceInitiator * initiator = [[DFUServiceInitiator alloc] initWithQueue:queue
+                                                                              delegateQueue:queue
+                                                                              progressQueue:queue
+                                                                                loggerQueue:queue
+                                                                      centralManagerOptions:nil];
 
-        // Change for iOS 13
-        initiator.packetReceiptNotificationParameter = 1; //Rate limit the DFU using PRN.
-        [NSThread sleepForTimeInterval: 2]; //Work around for being stuck in iOS 13
-        // End change for iOS 13
 
-        DFUServiceController * controller = [initiator start];
+            initiator.logger = self;
+            initiator.delegate = self;
+            initiator.progressDelegate = self;
+            initiator.alternativeAdvertisingNameEnabled = alternativeAdvertisingNameEnabled;
+
+            // Change for iOS 13+
+            initiator.packetReceiptNotificationParameter = 1; //Rate limit the DFU using PRN.
+            (void)[initiator withFirmware:firmware];
+            [NSThread sleepForTimeInterval: 5]; //Work around for being stuck in iOS 13+
+            // End change for iOS 13+
+
+            (void)[initiator startWithTarget:peripheral];
+        } @catch (NSException * e) {
+            NSString *errorMessage = [NSString stringWithFormat:@"Unable to start DFU: %@, reason: %@", e.name, e.reason];
+            reject(@"unable_to_start_dfu", errorMessage, nil);
+        }
       }
     }
   }
 }
 
-+ (void)setCentralManagerGetter:(CBCentralManager * (^)())getter
++ (void)setCentralManagerGetter:(CBCentralManager * (^)(void))getter
 {
   getCentralManager = getter;
 }
 
-+ (void)setOnDFUComplete:(void (^)())onComplete
++ (void)setOnDFUComplete:(void (^)(void))onComplete
 {
   onDFUComplete = onComplete;
 }
 
-+ (void)setOnDFUError:(void (^)())onError
++ (void)setOnDFUError:(void (^)(void))onError
 {
   onDFUError = onError;
 }
