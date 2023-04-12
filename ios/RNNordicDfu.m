@@ -224,14 +224,14 @@ RCT_EXPORT_METHOD(startDFU:(NSString *)deviceAddress
             NSError *error;
             DFUFirmware *firmware = [[DFUFirmware alloc] initWithUrlToZipFile:url error:&error];
 
-            DFUServiceInitiator *initiator = [[DFUServiceInitiator alloc]
-                                                initWithQueue:nil
-                                                delegateQueue:dispatch_get_main_queue()
-                                                progressQueue:dispatch_get_main_queue()
-                                                loggerQueue:dispatch_get_main_queue()
-                                                centralManagerOptions:nil];
+            dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
 
-            (void)[initiator withFirmware:firmware];
+            DFUServiceInitiator * initiator = [[DFUServiceInitiator alloc] initWithQueue:queue
+                                                                              delegateQueue:queue
+                                                                              progressQueue:queue
+                                                                                loggerQueue:queue
+                                                                      centralManagerOptions:nil];
+
 
             initiator.logger = self;
             initiator.delegate = self;
@@ -240,10 +240,11 @@ RCT_EXPORT_METHOD(startDFU:(NSString *)deviceAddress
 
             // Change for iOS 13+
             initiator.packetReceiptNotificationParameter = 1; //Rate limit the DFU using PRN.
+            (void)[initiator withFirmware:firmware];
             [NSThread sleepForTimeInterval: 5]; //Work around for being stuck in iOS 13+
             // End change for iOS 13+
 
-            (void)[initiator startWithTargetWithIdentifier:peripheral.identifier];
+            (void)[initiator startWithTarget:peripheral];
         } @catch (NSException * e) {
             NSString *errorMessage = [NSString stringWithFormat:@"Unable to start DFU: %@, reason: %@", e.name, e.reason];
             reject(@"unable_to_start_dfu", errorMessage, nil);
