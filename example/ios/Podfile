@@ -1,28 +1,43 @@
-platform :ios, "9.0"
+# platform :ios, "9.0"
+
+# External dependencies contain Swift, important to add this line
+# use_frameworks!
+
+# target "NordicDFUExample" do
+#   # Standard React Native dependencies when using CocoaPods
+#   pod "Yoga", path: "../node_modules/react-native/ReactCommon/yoga"
+#   pod "DoubleConversion", podspec: "../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec"
+#   pod "glog", podspec: "../node_modules/react-native/third-party-podspecs/glog.podspec"
+#   pod "Folly", podspec: "../node_modules/react-native/third-party-podspecs/Folly.podspec"
+#   pod "React", path: "../node_modules/react-native", subspecs: [
+#         "Core",
+#         "CxxBridge",
+#         "DevSupport",
+#         "RCTBlob",
+#         "RCTImage",
+#         "RCTLinkingIOS",
+#         "RCTText",
+#       ]
+
+#   pod "react-native-ble-manager", path: "../node_modules/react-native-ble-manager"
+#   pod "rn-fetch-blob", path: "../node_modules/rn-fetch-blob"
+
+#   # replace this path with "../node_modules/react-native-nordic-dfu" or wherever
+#   # it's installed in your project
+#   pod "react-native-nordic-dfu", path: "../../"
+# end
+
+require_relative '../node_modules/react-native/scripts/react_native_pods'
+require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
+
+platform :ios, '13.0'
 
 # External dependencies contain Swift, important to add this line
 use_frameworks!
 
-target "NordicDFUExample" do
-  # Standard React Native dependencies when using CocoaPods
-  pod "yoga", path: "../node_modules/react-native/ReactCommon/yoga"
-  pod "DoubleConversion", podspec: "../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec"
-  pod "glog", podspec: "../node_modules/react-native/third-party-podspecs/glog.podspec"
-  pod "Folly", podspec: "../node_modules/react-native/third-party-podspecs/Folly.podspec"
-  pod "React", path: "../node_modules/react-native", subspecs: [
-        "Core",
-        "CxxBridge",
-        "DevSupport",
-        "RCTBlob",
-        "RCTImage",
-        "RCTLinkingIOS",
-        "RCTText",
-      ]
+target 'NordicDFUExample' do
+  config = use_native_modules!
 
-  pod "react-native-ble-manager", path: "../node_modules/react-native-ble-manager"
-  pod "rn-fetch-blob", path: "../node_modules/rn-fetch-blob"
-
-  # replace this path with "../node_modules/react-native-nordic-dfu" or wherever
-  # it's installed in your project
-  pod "react-native-nordic-dfu", path: "../../"
+  # use_react_native!(:path => config["reactNativePath"])
+  use_react_native!(:path => config[:reactNativePath])
 end
